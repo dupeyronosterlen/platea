@@ -16,7 +16,9 @@
 | 2026-07-15 | Fix IC solo en click a Stripe (PR #2) + CAPI Purchase vivo | repo `elgorila` |
 | 2026-07-15–16 | Meta economía: CORE pausada; PURCHASE activa | Ads Manager + session backup |
 | 2026-07-16 | WF-07 migrado a Vertex (créditos XPRIZE) | n8n + scripts/n8n/ |
+| 2026-07-16 | Casa XPRIZE unificada (`10` → `09/expediente`) + push `a8ebd12` | https://github.com/dupeyronosterlen/platea |
 | 2026-07-16 | Bitácora viva: flush 63 decisiones → `bitacora-sesiones.md`; logger cableado Ag-03/06/12; launchd flush domingo | `04_Operaciones/norma-bitacora.md` |
+| 2026-07-16 | Ag-08 teasers←campañas (Meta read-only) | `generar_teasers_desde_campanas.py` + `carteles-s2/propuestas/` |
 
 ## Por capturar (screenshots pendientes)
 - [ ] Inbox con los emails automáticos de las 8:00/8:05 (varios días seguidos = mejor)
