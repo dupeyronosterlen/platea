@@ -36,12 +36,26 @@ import sys
 import json
 import datetime
 import requests
+from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 load_dotenv()
+
+
+def _bitacora(action: str, result: str, outcome: str = "ok") -> None:
+    """Registro operativo — nunca tumba el agente."""
+    try:
+        ops = Path(__file__).resolve().parents[2] / "04_Operaciones"
+        if str(ops) not in sys.path:
+            sys.path.insert(0, str(ops))
+        from platea_log import log_run
+        log_run("03 Media Buyer", action, result, outcome=outcome, step="ag03")
+    except Exception:
+        pass
+
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 META_TOKEN        = os.getenv("SYSTEM_USER_ACCESS_TOKEN")
@@ -197,7 +211,7 @@ def get_google_ads_performance(days: int = 7) -> dict:
         "developer-token": GADS_DEV_TOKEN,
         "Content-Type": "application/json",
     }
-    url = f"https://googleads.googleapis.com/v21/customers/{customer_id}/googleAds:search"
+    url = f"https://googleads.googleapis.com/v22/customers/{customer_id}/googleAds:search"
     r = requests.post(url, headers=headers, json={"query": query}, timeout=15)
 
     if not r.ok:
@@ -853,7 +867,13 @@ def main():
                     f"— Agente 03 Media Monitor, {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}",
                     urgente=True
                 )
+        _bitacora(
+            "check diario CPA",
+            f"CPA ${cpa or 'N/D'} · nivel {nivel} · ventas_sem {autonomy.get('ventas_boletera_semana')} · spend ${autonomy.get('spend_total', 0):.0f}",
+            outcome="ok" if nivel != "🔴" else "blocked",
+        )
         return
+
 
     # ── 4. Análisis Gemini ────────────────────────────────
     print("\n🧠 Consultando Gemini (Vertex AI)...")
@@ -904,7 +924,13 @@ def main():
         print(f"💾 Snapshot actualizado: {sum(vendidos_actual.values())} boletos acumulados")
 
     print("\n✅ Arranque D completado.")
+    _bitacora(
+        "reporte semanal Arranque D",
+        f"CPA ${autonomy.get('cpa_real') or 'N/D'} · nivel {nivel} · score {analysis.get('score')} · {week_label}",
+        outcome="ok" if nivel != "🔴" else "blocked",
+    )
 
 
 if __name__ == "__main__":
     main()
+

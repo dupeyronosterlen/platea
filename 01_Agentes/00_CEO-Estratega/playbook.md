@@ -67,7 +67,7 @@ REPORTE SEMANA #[N] — [fecha]
 - Toda recomendación de gasto incluye CPA esperado o ROI estimado
 - Siempre citar fuente y fecha de cada dato numérico
 - Nunca cambiar budget > 20% en Meta / > 15% en Google en una sola instrucción — ver `reglas-algoritmos-ads.md`
-- **Freno híbrido:** Dirección no responde 3h + CPA > $500 sostenido → pausar pauta afectada + notificar WA (5215512037223)
+- **Freno híbrido:** Dirección no responde 3h + CPA > $500 sostenido → pausar pauta afectada + notificar WA ([REDACTED])
 - Las decisiones sobre venue, precios, contratos o Humberto escalan a Dirección directamente
 
 ## Los 10 movimientos (referencia rápida)
@@ -80,4 +80,4 @@ Ver `tablero-s2-escenarios.md` para detalle. Checkpoints clave:
 - **M9 — 1 sep:** Push cierre de temporada
 
 ## Escalación
-Eres el tope de la cadena interna. Lo que no puedas resolver sin Dirección, lo escalas sin dudar. WA Dirección: 5215512037223.
+Eres el tope de la cadena interna. Lo que no puedas resolver sin Dirección, lo escalas sin dudar. WA Dirección: [REDACTED].

@@ -24,11 +24,24 @@ import sys
 import json
 import datetime
 import requests
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Reusa el .env del Media Buyer (misma cuenta Meta, misma boletera)
 ENV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "03_Media-Buyer", ".env")
 load_dotenv(ENV_PATH)
+
+
+def _bitacora(action: str, result: str, outcome: str = "ok") -> None:
+    try:
+        ops = Path(__file__).resolve().parents[2] / "04_Operaciones"
+        if str(ops) not in sys.path:
+            sys.path.insert(0, str(ops))
+        from platea_log import log_run
+        log_run("06 Analytics", action, result, outcome=outcome, step="ag06")
+    except Exception:
+        pass
+
 
 META_TOKEN    = os.getenv("SYSTEM_USER_ACCESS_TOKEN")
 AD_ACCOUNT_ID = os.getenv("AD_ACCOUNT_ID", "act_389427487828383")
@@ -103,6 +116,28 @@ def fetch_meta_funnel(days: int) -> dict:
     return {"desde": str(desde), "hasta": str(hoy), "total": tot, "campanas": campanas}
 
 
+FRECUENCIA_MAX = 4.0  # regla de Dirección (11 jul): arriba de esto = hostigamiento, alertar
+
+
+def fetch_frecuencia(days: int) -> list:
+    """Alcance y frecuencia por adset — vigila que no hostiguemos a nadie."""
+    hoy = datetime.date.today()
+    desde = hoy - datetime.timedelta(days=days)
+    r = requests.get(
+        f"{GRAPH}/{AD_ACCOUNT_ID}/insights",
+        params={
+            "access_token": META_TOKEN, "level": "adset",
+            "fields": "adset_name,reach,frequency",
+            "time_range": json.dumps({"since": str(desde), "until": str(hoy)}),
+            "limit": 50,
+        }, timeout=30)
+    r.raise_for_status()
+    return [{"adset": row.get("adset_name", "?"),
+             "personas": int(row.get("reach", 0)),
+             "frecuencia": round(float(row.get("frequency", 0)), 1)}
+            for row in r.json().get("data", [])]
+
+
 def fetch_boletera() -> dict:
     """Boletos reales acumulados por función (solo lectura)."""
     r = requests.get(f"{BOLETERA_URL}/api/{TEATRO_ID}/funciones", timeout=10)
@@ -174,6 +209,12 @@ def build_text(out: dict) -> str:
         lines.append("")
         lines.append(f"   🎯 FUGA PRINCIPAL: {f['etapa']} — {f['diagnostico']}")
         lines.append(f"      → {f['ataque']}")
+    if out.get("frecuencias"):
+        lines.append("")
+        lines.append(f"   👁️ FRECUENCIA (veces/persona esta semana · regla: alertar si >{FRECUENCIA_MAX:.0f}):")
+        for fr in out["frecuencias"]:
+            marca = "🔴 HOSTIGAMIENTO — bajar presupuesto o refrescar creativo" if fr["frecuencia"] > FRECUENCIA_MAX else "✅"
+            lines.append(f"      {marca} {fr['adset'][:32]}: {fr['frecuencia']}x a {fr['personas']:,} personas")
     lines.append("")
     lines.append("   (solo lectura — este agente nunca modifica nada)")
     return "\n".join(lines)
@@ -213,6 +254,10 @@ def main():
         boletera = fetch_boletera()
     except Exception as e:
         boletera = {"status": "error", "error": str(e)}
+    try:
+        frecuencias = fetch_frecuencia(days)
+    except Exception:
+        frecuencias = []
 
     t = meta["total"]
     hallazgos = diagnose(t)
@@ -225,6 +270,8 @@ def main():
         "fuga_principal": min(fugas, key=lambda h: h["tasa_pct"] / h["benchmark_pct"]) if fugas else None,
         "boletera": boletera,
         "campanas": meta["campanas"],
+        "frecuencias": frecuencias,
+        "hostigamiento": [f for f in frecuencias if f["frecuencia"] > FRECUENCIA_MAX],
     }
 
     if as_json:
@@ -239,6 +286,14 @@ def main():
         ok = send_email(subject, texto)
         print(f"\n📧 Email: {'enviado' if ok else 'FALLÓ'}")
 
+    fuga = out.get("fuga_principal")
+    _bitacora(
+        "funnel diario",
+        f"periodo {out['periodo']} · fuga={fuga['etapa'] if fuga else 'ninguna'} · email={'sí' if do_email else 'no'}",
+        outcome="ok",  # fuga crónica ≠ crisis; JSONL sí, bitácora hackathon no
+    )
+
 
 if __name__ == "__main__":
     main()
+

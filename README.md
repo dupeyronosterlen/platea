@@ -2,40 +2,44 @@
 
 > **XPRIZE "Build with Gemini" submission** · Proof of concept running in production:
 > *El Gorila*, a monologue with 37 years on stage, Teatro Wilberto Cantón, Mexico City — real tickets, real money, one human in the loop.
+>
+> Status: **live and still being built**. Core loops run every morning; more agents and automations land as the season proves them.
 
-**Platea** es una agencia de marketing teatral operada por 16 agentes de IA (Gemini 2.5 Pro
-en Vertex AI). No es un demo: vende boletos reales de una temporada teatral real, con un solo
-humano (el productor) aprobando decisiones.
+**Platea** is a theater-marketing agency operated by AI agents (Gemini on Vertex AI / Google Cloud).
+It is not a slide-deck demo: it sells real tickets for a real season, with one human (the producer) approving what goes public.
 
-## Qué hace hoy, sola, cada mañana
+> This repository is the **agency brain** (agents + evidence). The live box-office site is separate:
+> [elgorilateatro.com.mx](https://elgorilateatro.com.mx) · code: [`dupeyronosterlen/elgorila`](https://github.com/dupeyronosterlen/elgorila).
+> Updating *this* repo never deploys the ticket site.
 
-| Hora | Agente | Función |
-|------|--------|---------|
-| 8:00 | 03 Media Buyer | Lee Meta Ads API + boletera propia (Stripe) → CPA real → alerta si urge |
-| 8:03 | 12 Boletera | Ocupación por función, boletera caída → alerta |
-| 8:05 | 06 Analytics | Funnel completo (impresión→click→visita→checkout→compra) → diagnóstico diario |
-| dom 8:10 | 03 + Gemini | Reporte semanal con análisis y propuestas |
+## What runs alone each morning
 
-Resultados verificables (julio 2026): CPA **$122 MXN** vs objetivo $350 · fuga del funnel
-identificada por el agente (checkout 2.7% vs benchmark 20%) · campaña de conversión construida
-por el agente vía Graph API a partir de sus propios hallazgos.
+| Time | Agent | Job |
+|------|--------|-----|
+| 8:00 | 03 Media Buyer | Meta Ads API + own box office (Stripe) → real CPA → email if urgent |
+| 8:03 | 12 Boletera | Occupancy by show; down-detection → alert |
+| 8:05 | 06 Analytics | Funnel (impression→click→visit→checkout→purchase) → daily diagnosis |
+| Sun 8:10 | 03 + Gemini | Weekly report |
+| Sun 8:15 | Graphify | Repo knowledge-graph refresh (AST) |
+| Sun 8:20 | Ag-15 | Flush session decisions → readable logbook |
 
-## Arquitectura (VIBE)
+Verifiable results (July 2026): CPA **$122 MXN** vs $350 target · funnel leak found by the agent (checkout 2.7% vs 20% benchmark) · WhatsApp bot in production on Vertex · decision logbook for the hackathon.
 
-- **V**isión — objetivo único: CPA ≤ $350 medido en taquilla, no en plataformas de ads
-- **I**nsumos — identidad, ICP, precios, historia de la obra
-- **B**rain — toda decisión queda registrada y auditable (`session_decisions.json`)
-- **E**ngine — agentes Python + launchd + n8n + Cloudflare Workers + boletera Stripe propia
+## Architecture (VIBE)
 
-## Estructura de este repo
+- **V**ision — one goal: CPA ≤ $350 measured at the box office, not inside ad platforms
+- **I**nputs — identity, ICP, prices, show history
+- **B**rain — every decision is logged (`session_decisions` → bitácora)
+- **E**ngine — Python agents + launchd + n8n + Cloudflare Workers + Stripe box office
+
+## What's in this repo
 
 ```
-01_Agentes/            código y persona de cada agente (sin credenciales)
-taquilla/reporte-worker/  worker read-only que alimenta a los agentes
-09_XPRIZE/             plan de submission, guion del video, índice de evidencia
+01_Agentes/              agent code + personas (no credentials, no .env)
+taquilla/reporte-worker/ read-only worker that feeds agents
+09_XPRIZE/               submission plan, evidence index, sanitization rules
 ```
 
-Las reglas del sistema: el humano aprueba todo lo público; los agentes detectan y proponen;
-nada toca la venta en vivo sin aprobación; cada corrida deja bitácora.
+Rules: the human approves anything public; agents detect and propose; nothing touches live ticket sales without approval; every run leaves a trail.
 
-— Hecho en CDMX. Teatro independiente + IA.
+— Built in Mexico City. Independent theater + AI.

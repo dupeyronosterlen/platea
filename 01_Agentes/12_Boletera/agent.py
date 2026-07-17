@@ -32,9 +32,22 @@ import sys
 import json
 import datetime
 import requests
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def _bitacora(action: str, result: str, outcome: str = "ok") -> None:
+    try:
+        ops = Path(__file__).resolve().parents[2] / "04_Operaciones"
+        if str(ops) not in sys.path:
+            sys.path.insert(0, str(ops))
+        from platea_log import log_run
+        log_run("12 Boletera", action, result, outcome=outcome, step="ag12")
+    except Exception:
+        pass
+
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BOLETERA_URL         = os.getenv("BOLETERA_URL", "https://elgorila-api.dupeyronosterlen.workers.dev")
@@ -502,7 +515,9 @@ def main():
     # ── 6. Email ──────────────────────────────────────────────────────────────
     if silent:
         print("⚪ Modo --silent: no se envía email.")
+        _bitacora("check diario boletera (--silent)", f"alertas={len(alertas)} nivel={'🔴' if nivel_urgente else '🟡' if nivel_alerta else '🟢'}")
         return
+
 
     proxima = snapshot.get("proxima_funcion") or {}
     fecha_prox = proxima.get("fecha", "?")
@@ -522,6 +537,15 @@ def main():
     else:
         print("🟢 Sin alertas — no se envía email.")
 
+    nivel = "🔴" if nivel_urgente else "🟡" if nivel_alerta else "🟢"
+    total = snapshot.get("total_vendidos") or snapshot.get("vendidos_total") or "?"
+    _bitacora(
+        "alerta ocupación crítica" if nivel_urgente else "check diario boletera",
+        f"nivel {nivel} · alertas {len(alertas)} · próxima {fecha_prox} · vendidos≈{total}",
+        outcome="blocked" if nivel_urgente else "ok",
+    )
+
 
 if __name__ == "__main__":
     main()
+
