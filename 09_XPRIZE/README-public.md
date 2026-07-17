@@ -38,6 +38,7 @@ Verifiable results (July 2026): CPA **$122 MXN** vs $350 target · funnel leak f
 01_Agentes/              agent code + personas (no credentials, no .env)
 taquilla/reporte-worker/ read-only worker that feeds agents
 09_XPRIZE/               submission plan, evidence index, sanitization rules
+09_XPRIZE/expediente/    Devpost checklist, finance, eligibility, deadlines, official rules
 ```
 
 Rules: the human approves anything public; agents detect and propose; nothing touches live ticket sales without approval; every run leaves a trail.
