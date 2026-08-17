@@ -1,0 +1,16 @@
+{
+  "source": "/Users/osterlendupeyron/Dropbox/P. Gorila/Platea/09_XPRIZE/evidencia-finanzas/unified_payments.csv",
+  "as_of": "2026-08-15",
+  "hackathon": "2026-05-19 to 2026-08-15",
+  "fx_note": "July FIX 17.3288 (31 jul); August FIX 17.0218 (14 ago). May/June PLACEHOLDER until Banxico pull.",
+  "fx": {
+    "5": "19.4300",
+    "6": "18.9000",
+    "7": "17.3288",
+    "8": "17.0218"
+  },
+  "n_raw": 136,
+  "n_paid_window": 85,
+  "s1_file": true,
+  "s1_n": 178
+}
