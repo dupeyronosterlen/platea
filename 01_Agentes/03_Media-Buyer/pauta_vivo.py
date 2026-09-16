@@ -270,7 +270,7 @@ def pull_google():
 
     def gaql(q):
         r = requests.post(
-            f"https://googleads.googleapis.com/v22/customers/{cid}/googleAds:search",
+            f"https://googleads.googleapis.com/v25/customers/{cid}/googleAds:search",
             headers=gh,
             json={"query": q},
             timeout=30,

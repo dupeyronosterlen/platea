@@ -684,7 +684,7 @@ def get_google_ads_performance(days: int = 7) -> dict:
     """
 
     headers = _gads_headers(token)
-    url = f"https://googleads.googleapis.com/v22/customers/{customer_id}/googleAds:search"
+    url = f"https://googleads.googleapis.com/v25/customers/{customer_id}/googleAds:search"
     r = requests.post(url, headers=headers, json={"query": query}, timeout=15)
 
     if not r.ok:
@@ -748,7 +748,7 @@ def _gads_gaql(query: str) -> dict:
     if not token or not GADS_DEV_TOKEN:
         return {"error": "no oauth/token"}
     cid = _gads_customer_id()
-    url = f"https://googleads.googleapis.com/v22/customers/{cid}/googleAds:search"
+    url = f"https://googleads.googleapis.com/v25/customers/{cid}/googleAds:search"
     r = requests.post(url, headers=_gads_headers(token), json={"query": query}, timeout=20)
     if not r.ok:
         return {"error": r.text[:400]}
@@ -760,7 +760,7 @@ def _gads_mutate(resource: str, body: dict) -> dict:
     if not token or not GADS_DEV_TOKEN:
         return {"error": "no oauth/token"}
     cid = _gads_customer_id()
-    url = f"https://googleads.googleapis.com/v22/customers/{cid}/{resource}:mutate"
+    url = f"https://googleads.googleapis.com/v25/customers/{cid}/{resource}:mutate"
     r = requests.post(url, headers=_gads_headers(token), json=body, timeout=30)
     if not r.ok:
         return {"error": r.text[:600]}

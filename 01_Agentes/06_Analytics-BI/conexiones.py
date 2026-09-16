@@ -3,7 +3,7 @@
 Conexiones de datos del Agente 06 — Analytics y BI.
 
 Esta es la conexión "viva" que el agente debe poseer:
-  - Google Ads API (REST, GAQL, v21) vía OAuth refresh token
+  - Google Ads API (REST, GAQL, v25) vía OAuth refresh token
   - GA4 Data API (reportes estándar + tiempo real) vía OAuth refresh token
 
 Uso como módulo:
@@ -33,7 +33,7 @@ GADS_REFRESH = os.getenv("GOOGLE_ADS_REFRESH_TOKEN")
 GADS_DEV_TOKEN = os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN")
 GADS_CUSTOMER = os.getenv("GOOGLE_ADS_CUSTOMER_ID", "2681423694").replace("-", "")
 GADS_LOGIN = os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID", "8974056133")
-GADS_VERSION = os.getenv("GOOGLE_ADS_API_VERSION", "v21")
+GADS_VERSION = os.getenv("GOOGLE_ADS_API_VERSION", "v25")
 
 # ── GA4 ───────────────────────────────────────────────────────────────────────
 GA4_REFRESH = os.getenv("GOOGLE_ANALYTICS_REFRESH_TOKEN")
